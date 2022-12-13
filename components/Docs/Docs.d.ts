@@ -16,13 +16,14 @@ interface BaseDocsProps {
     layoutOptions?: {
         hideTryIt?: boolean;
         hideTryItPanel?: boolean;
-        noHeading?: true;
+        noHeading?: boolean;
         showPoweredByLink?: boolean;
         hideModelExamples?: boolean;
         hideServerInfo?: boolean;
         hideSecurityInfo?: boolean;
         hideExport?: boolean;
         compact?: number | boolean;
+        defaultExpandedDepth?: number;
     };
     nodeHasChanged?: NodeHasChangedFn<React.ReactNode>;
 }

@@ -2194,7 +2194,7 @@ const isBodyEmpty = (body) => {
     const { contents = [], description } = body;
     return contents.length === 0 && !(description === null || description === void 0 ? void 0 : description.trim());
 };
-const Body = ({ body, onChange }) => {
+const Body = ({ body, defaultExpandedDepth, onChange }) => {
     var _a;
     const refResolver = useInlineRefResolver();
     const [chosenContent, setChosenContent] = React__namespace.useState(0);
@@ -2213,7 +2213,7 @@ const Body = ({ body, onChange }) => {
         description && (React__namespace.createElement(mosaic.Box, { pos: "relative" },
             React__namespace.createElement(MarkdownViewer, { markdown: description }),
             React__namespace.createElement(mosaic.NodeAnnotation, { change: descriptionChanged }))),
-        isJSONSchema(schema) && (React__namespace.createElement(jsonSchemaViewer.JsonSchemaViewer, { resolveRef: refResolver, schema: getOriginalObject(schema), viewMode: "write", renderRootTreeLines: true, nodeHasChanged: nodeHasChanged, defaultExpandedDepth: 2 }))));
+        isJSONSchema(schema) && (React__namespace.createElement(jsonSchemaViewer.JsonSchemaViewer, { resolveRef: refResolver, schema: getOriginalObject(schema), viewMode: "write", renderRootTreeLines: true, nodeHasChanged: nodeHasChanged, defaultExpandedDepth: defaultExpandedDepth || 2 }))));
 };
 Body.displayName = 'HttpOperation.Body';
 
@@ -2277,7 +2277,7 @@ const httpOperationParamsToSchema = ({ parameters, parameterType }) => {
     return schema;
 };
 
-const Request = ({ operation: { request, request: { path: pathParams = [], headers: headerParams = [], cookie: cookieParams = [], body, query: queryParams = [], } = {}, security, }, onChange, }) => {
+const Request = ({ operation: { request, request: { path: pathParams = [], headers: headerParams = [], cookie: cookieParams = [], body, query: queryParams = [], } = {}, security, }, defaultExpandedDepth, onChange, }) => {
     if (!request || typeof request !== 'object')
         return null;
     const bodyIsEmpty = isBodyEmpty(body);
@@ -2305,7 +2305,7 @@ const Request = ({ operation: { request, request: { path: pathParams = [], heade
         cookieParams.length > 0 && (React__namespace.createElement(mosaic.VStack, { spacing: 5 },
             React__namespace.createElement(SectionSubtitle, { title: "Cookies", id: "request-cookies" }),
             React__namespace.createElement(Parameters, { parameterType: "cookie", parameters: cookieParams }))),
-        body && React__namespace.createElement(Body, { onChange: onChange, body: body })));
+        body && React__namespace.createElement(Body, { onChange: onChange, body: body, defaultExpandedDepth: defaultExpandedDepth })));
 };
 Request.displayName = 'HttpOperation.Request';
 const schemeExpandedState = utils.atomWithStorage('HttpOperation_security_expanded', {});
@@ -2324,7 +2324,7 @@ const SecuritySchemes$1 = ({ schemes }) => {
         React__namespace.createElement(mosaic.NodeAnnotation, { change: nodeHasChanged === null || nodeHasChanged === void 0 ? void 0 : nodeHasChanged({ nodeId: scheme.id }) }))))));
 };
 
-const Responses = ({ responses: unsortedResponses, onStatusCodeChange, onMediaTypeChange }) => {
+const Responses = ({ responses: unsortedResponses, defaultExpandedDepth, onStatusCodeChange, onMediaTypeChange }) => {
     var _a, _b;
     const responses = sortBy__default["default"](uniqBy__default["default"](unsortedResponses, r => r.code), r => r.code);
     const [activeResponseId, setActiveResponseId] = React__namespace.useState((_b = (_a = responses[0]) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : '');
@@ -2337,10 +2337,10 @@ const Responses = ({ responses: unsortedResponses, onStatusCodeChange, onMediaTy
         React__namespace.createElement(SectionTitle, { title: "Responses" },
             React__namespace.createElement(mosaic.TabList, { density: "compact" }, responses.map(({ code }) => (React__namespace.createElement(mosaic.Tab, { key: code, id: code, intent: codeToIntentVal(code) }, code))))),
         React__namespace.createElement(mosaic.TabPanels, { p: 0 }, responses.map(response => (React__namespace.createElement(mosaic.TabPanel, { key: response.code, id: response.code },
-            React__namespace.createElement(Response, { response: response, onMediaTypeChange: onMediaTypeChange })))))));
+            React__namespace.createElement(Response, { response: response, defaultExpandedDepth: defaultExpandedDepth, onMediaTypeChange: onMediaTypeChange })))))));
 };
 Responses.displayName = 'HttpOperation.Responses';
-const Response = ({ response, onMediaTypeChange }) => {
+const Response = ({ response, defaultExpandedDepth, onMediaTypeChange }) => {
     const { contents = [], headers = [], description } = response;
     const [chosenContent, setChosenContent] = React__namespace.useState(0);
     const refResolver = useInlineRefResolver();
@@ -2362,7 +2362,7 @@ const Response = ({ response, onMediaTypeChange }) => {
             React__namespace.createElement(SectionSubtitle, { title: "Body", id: "response-body" },
                 React__namespace.createElement(mosaic.Flex, { flex: 1, justify: "end" },
                     React__namespace.createElement(mosaic.Select, { "aria-label": "Response Body Content Type", value: String(chosenContent), onChange: (value) => setChosenContent(parseInt(String(value), 10)), options: contents.map((content, index) => ({ label: content.mediaType, value: index })), size: "sm" }))),
-            schema && (React__namespace.createElement(jsonSchemaViewer.JsonSchemaViewer, { schema: getOriginalObject(schema), resolveRef: refResolver, viewMode: "read", parentCrumbs: ['responses', response.code], renderRootTreeLines: true, nodeHasChanged: nodeHasChanged, defaultExpandedDepth: 2 }))))));
+            schema && (React__namespace.createElement(jsonSchemaViewer.JsonSchemaViewer, { schema: getOriginalObject(schema), resolveRef: refResolver, viewMode: "read", parentCrumbs: ['responses', response.code], renderRootTreeLines: true, nodeHasChanged: nodeHasChanged, defaultExpandedDepth: defaultExpandedDepth || 2 }))))));
 };
 Response.displayName = 'HttpOperation.Response';
 const codeToIntentVal = (code) => {
@@ -2396,8 +2396,8 @@ const HttpOperationComponent = React__namespace.memo(({ className, data: unresol
         data.description && (React__namespace.createElement(mosaic.Box, { pos: "relative" },
             React__namespace.createElement(MarkdownViewer, { className: "HttpOperation__Description", markdown: data.description }),
             React__namespace.createElement(mosaic.NodeAnnotation, { change: descriptionChanged }))),
-        React__namespace.createElement(Request, { onChange: setTextRequestBodyIndex, operation: data }),
-        data.responses && (React__namespace.createElement(Responses, { responses: data.responses, onMediaTypeChange: setResponseMediaType, onStatusCodeChange: setResponseStatusCode }))));
+        React__namespace.createElement(Request, { onChange: setTextRequestBodyIndex, operation: data, defaultExpandedDepth: layoutOptions === null || layoutOptions === void 0 ? void 0 : layoutOptions.defaultExpandedDepth }),
+        data.responses && (React__namespace.createElement(Responses, { responses: data.responses, defaultExpandedDepth: layoutOptions === null || layoutOptions === void 0 ? void 0 : layoutOptions.defaultExpandedDepth, onMediaTypeChange: setResponseMediaType, onStatusCodeChange: setResponseStatusCode }))));
     const tryItPanel = !(layoutOptions === null || layoutOptions === void 0 ? void 0 : layoutOptions.hideTryItPanel) && (React__namespace.createElement(TryItWithRequestSamples, { httpOperation: data, responseMediaType: responseMediaType, responseStatusCode: responseStatusCode, requestBodyIndex: requestBodyIndex, hideTryIt: layoutOptions === null || layoutOptions === void 0 ? void 0 : layoutOptions.hideTryIt, tryItCredentialsPolicy: tryItCredentialsPolicy, mockUrl: mocking.hideMocking ? undefined : mocking.mockUrl, corsProxy: tryItCorsProxy }));
     return (React__namespace.createElement(TwoColumnLayout, { className: cn__default["default"]('HttpOperation', className), header: header, left: description, right: tryItPanel }));
 });
@@ -2446,14 +2446,6 @@ function OperationHeader({ id, noHeading, hasBadges, name, isDeprecated, isInter
             React__namespace.createElement(MethodPath, { method: method, path: path }),
             React__namespace.createElement(mosaic.NodeAnnotation, { change: lineTwoChanged }))));
 }
-
-const PoweredByLink = ({ source, pathname, packageType, layout = 'sidebar' }) => {
-    return (React__namespace.createElement(mosaic.Flex, { as: "a", align: "center", borderT: layout === 'stacked' ? undefined : true, px: layout === 'stacked' ? 1 : 4, py: 3, justify: layout === 'stacked' ? 'end' : undefined, href: `https://stoplight.io/?utm_source=${packageType}&utm_medium=${source}&utm_campaign=powered_by&utm_content=${pathname}`, target: "_blank", rel: "noopener noreferrer" },
-        React__namespace.createElement(mosaic.Box, { as: mosaic.Icon, icon: faBolt, mr: 1, className: "fa-fw", style: { color: 'rgba(144, 97, 249, 1)' } }),
-        React__namespace.createElement(mosaic.Box, null,
-            "powered by\u00A0",
-            React__namespace.createElement("strong", null, "Stoplight"))));
-};
 
 const AdditionalInfo = ({ id, termsOfService, contact, license }) => {
     const { nodeHasChanged } = useOptionsCtx();
@@ -2537,10 +2529,10 @@ const ServerUrl = ({ id, description, url }) => {
 };
 
 const HttpServiceComponent = React__namespace.memo(({ data: unresolvedData, location = {}, layoutOptions, exportProps }) => {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     const { nodeHasChanged } = useOptionsCtx();
     const data = useResolvedObject(unresolvedData);
-    const { search, pathname } = location;
+    const { search } = location;
     const mocking = React__namespace.useContext(MockingContext);
     const query = new URLSearchParams(search);
     const nameChanged = nodeHasChanged === null || nodeHasChanged === void 0 ? void 0 : nodeHasChanged({ nodeId: data.id, attr: 'name' });
@@ -2555,11 +2547,10 @@ const HttpServiceComponent = React__namespace.memo(({ data: unresolvedData, loca
         data.version && (React__namespace.createElement(mosaic.Box, { mb: 5, pos: "relative" },
             React__namespace.createElement(VersionBadge, { value: data.version }),
             React__namespace.createElement(mosaic.NodeAnnotation, { change: versionChanged }))),
-        pathname && (layoutOptions === null || layoutOptions === void 0 ? void 0 : layoutOptions.showPoweredByLink) && (React__namespace.createElement(PoweredByLink, { source: (_a = data.name) !== null && _a !== void 0 ? _a : 'no-title', pathname: pathname, packageType: "elements", layout: "stacked" })),
         React__namespace.createElement(mosaic.VStack, { spacing: 6 },
-            React__namespace.createElement(ServerInfo, { servers: (_b = data.servers) !== null && _b !== void 0 ? _b : [], mockUrl: mocking.mockUrl }),
-            React__namespace.createElement(mosaic.Box, null, ((_c = data.securitySchemes) === null || _c === void 0 ? void 0 : _c.length) ? (React__namespace.createElement(SecuritySchemes, { schemes: data.securitySchemes, defaultScheme: query.get('security') || undefined })) : null),
-            React__namespace.createElement(mosaic.Box, null, (((_d = data.contact) === null || _d === void 0 ? void 0 : _d.email) || data.license || data.termsOfService) && (React__namespace.createElement(AdditionalInfo, { id: data.id, contact: data.contact, license: data.license, termsOfService: data.termsOfService })))),
+            React__namespace.createElement(ServerInfo, { servers: (_a = data.servers) !== null && _a !== void 0 ? _a : [], mockUrl: mocking.mockUrl }),
+            React__namespace.createElement(mosaic.Box, null, ((_b = data.securitySchemes) === null || _b === void 0 ? void 0 : _b.length) ? (React__namespace.createElement(SecuritySchemes, { schemes: data.securitySchemes, defaultScheme: query.get('security') || undefined })) : null),
+            React__namespace.createElement(mosaic.Box, null, (((_c = data.contact) === null || _c === void 0 ? void 0 : _c.email) || data.license || data.termsOfService) && (React__namespace.createElement(AdditionalInfo, { id: data.id, contact: data.contact, license: data.license, termsOfService: data.termsOfService })))),
         data.description && (React__namespace.createElement(mosaic.Box, { pos: "relative" },
             React__namespace.createElement(MarkdownViewer, { className: "sl-my-5", markdown: data.description }),
             React__namespace.createElement(mosaic.NodeAnnotation, { change: descriptionChanged })))));
@@ -3043,6 +3034,14 @@ const NonIdealState = ({ description, icon, title }) => {
         React__namespace.createElement(mosaic.Box, { as: mosaic.Icon, icon: icon || ['fas', 'exclamation-triangle'], color: "light", fontSize: "6xl", mb: 4 }),
         React__namespace.createElement(mosaic.Heading, { size: 4, mb: 4 }, title),
         React__namespace.createElement(mosaic.Text, null, description)));
+};
+
+const PoweredByLink = ({ source, pathname, packageType, layout = 'sidebar' }) => {
+    return (React__namespace.createElement(mosaic.Flex, { as: "a", align: "center", borderT: layout === 'stacked' ? undefined : true, px: layout === 'stacked' ? 1 : 4, py: 3, justify: layout === 'stacked' ? 'end' : undefined, href: `https://stoplight.io/?utm_source=${packageType}&utm_medium=${source}&utm_campaign=powered_by&utm_content=${pathname}`, target: "_blank", rel: "noopener noreferrer" },
+        React__namespace.createElement(mosaic.Box, { as: mosaic.Icon, icon: faBolt, mr: 1, className: "fa-fw", style: { color: 'rgba(144, 97, 249, 1)' } }),
+        React__namespace.createElement(mosaic.Box, null,
+            "powered by\u00A0",
+            React__namespace.createElement("strong", null, "Stoplight"))));
 };
 
 function withMosaicProvider(WrappedComponent) {
