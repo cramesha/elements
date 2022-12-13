@@ -9,6 +9,7 @@ declare type StackedLayoutProps = {
     exportProps?: ExportButtonProps;
     tryItCredentialsPolicy?: TryItCredentialsPolicy;
     tryItCorsProxy?: string;
+    defaultExpandedDepth?: number;
 };
 export declare const APIWithStackedLayout: React.FC<StackedLayoutProps>;
 export {};

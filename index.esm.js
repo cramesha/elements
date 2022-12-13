@@ -1,4 +1,4 @@
-import { isHttpOperation, isHttpService, Logo, TableOfContents, PoweredByLink, SidebarLayout, ParsedDocs, HttpMethodColors, DeprecatedBadge, TryItWithRequestSamples, Docs, slugify, withRouter, withStyles, withPersistenceBoundary, withMosaicProvider, withQueryClientProvider, useParsedValue, useBundleRefsIntoDocument, NonIdealState, InlineRefResolverProvider } from '@stoplight/elements-core';
+import { isHttpOperation, isHttpService, Logo, TableOfContents, SidebarLayout, ParsedDocs, HttpMethodColors, DeprecatedBadge, TryItWithRequestSamples, Docs, slugify, withRouter, withStyles, withPersistenceBoundary, withMosaicProvider, withQueryClientProvider, useParsedValue, useBundleRefsIntoDocument, NonIdealState, InlineRefResolverProvider } from '@stoplight/elements-core';
 import { Flex, Heading, Box, Icon, Tabs, TabList, Tab, TabPanels, TabPanel } from '@stoplight/mosaic';
 import flow from 'lodash/flow.js';
 import * as React from 'react';
@@ -157,14 +157,14 @@ const isInternal = (node) => {
     return !!data['x-internal'];
 };
 
-const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, }) => {
+const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth }) => {
     const container = React.useRef(null);
     const tree = React.useMemo(() => computeAPITree(serviceNode, { hideSchemas, hideInternal }), [serviceNode, hideSchemas, hideInternal]);
     const location = useLocation();
     const { pathname } = location;
     const isRootPath = !pathname || pathname === '/';
     const node = isRootPath ? serviceNode : serviceNode.children.find(child => child.uri === pathname);
-    const layoutOptions = React.useMemo(() => ({ hideTryIt: hideTryIt, hideExport: hideExport || (node === null || node === void 0 ? void 0 : node.type) !== NodeType.HttpService }), [hideTryIt, hideExport, node]);
+    const layoutOptions = React.useMemo(() => ({ hideTryIt: hideTryIt, hideExport: hideExport || (node === null || node === void 0 ? void 0 : node.type) !== NodeType.HttpService, defaultExpandedDepth }), [hideTryIt, hideExport, node, defaultExpandedDepth]);
     if (!node) {
         const firstSlug = findFirstNodeSlug(tree);
         if (firstSlug) {
@@ -184,8 +184,7 @@ const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSche
             logo ? (React.createElement(Logo, { logo: { url: logo, altText: 'logo', href: logoLink || 'https://solargraf.com/' } })) : (serviceNode.data.logo && React.createElement(Logo, { logo: serviceNode.data.logo })),
             React.createElement(Heading, { size: 4 }, serviceNode.name)),
         React.createElement(Flex, { flexGrow: true, flexShrink: true, overflowY: "auto", direction: "col" },
-            React.createElement(TableOfContents, { tree: tree, activeId: pathname, Link: Link, onLinkClick: handleTocClick })),
-        React.createElement(PoweredByLink, { source: serviceNode.name, pathname: pathname, packageType: "elements" })));
+            React.createElement(TableOfContents, { tree: tree, activeId: pathname, Link: Link, onLinkClick: handleTocClick }))));
     return (React.createElement(SidebarLayout, { ref: container, sidebar: sidebar }, node && (React.createElement(ParsedDocs, { key: pathname, uri: pathname, node: node, nodeTitle: node.name, layoutOptions: layoutOptions, location: location, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy }))));
 };
 
@@ -197,13 +196,13 @@ const TryItContext = React.createContext({
     tryItCredentialsPolicy: 'omit',
 });
 TryItContext.displayName = 'TryItContext';
-const APIWithStackedLayout = ({ serviceNode, hideTryIt, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, }) => {
+const APIWithStackedLayout = ({ serviceNode, hideTryIt, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth }) => {
     const location = useLocation();
     const { groups } = computeTagGroups(serviceNode);
     return (React.createElement(TryItContext.Provider, { value: { hideTryIt, tryItCredentialsPolicy, corsProxy: tryItCorsProxy } },
         React.createElement(Flex, { w: "full", flexDirection: "col", m: "auto", className: "sl-max-w-4xl" },
             React.createElement(Box, { w: "full", borderB: true },
-                React.createElement(Docs, { className: "sl-mx-auto", nodeData: serviceNode.data, nodeTitle: serviceNode.name, nodeType: NodeType.HttpService, location: location, layoutOptions: { showPoweredByLink: true, hideExport }, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy })),
+                React.createElement(Docs, { className: "sl-mx-auto", nodeData: serviceNode.data, nodeTitle: serviceNode.name, nodeType: NodeType.HttpService, location: location, layoutOptions: { showPoweredByLink: false, hideExport, defaultExpandedDepth }, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy })),
             groups.map(group => (React.createElement(Group, { key: group.title, group: group }))))));
 };
 const Group = React.memo(({ group }) => {
@@ -482,7 +481,7 @@ const propsAreWithDocument = (props) => {
     return props.hasOwnProperty('apiDescriptionDocument');
 };
 const APIImpl = props => {
-    const { layout, apiDescriptionUrl = '', logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, tryItCredentialsPolicy, tryItCorsProxy, } = props;
+    const { layout, apiDescriptionUrl = '', logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth } = props;
     const apiDescriptionDocument = propsAreWithDocument(props) ? props.apiDescriptionDocument : undefined;
     const { data: fetchedDocument, error } = useQuery([apiDescriptionUrl], () => fetch(apiDescriptionUrl).then(res => {
         if (res.ok) {
@@ -509,7 +508,7 @@ const APIImpl = props => {
         return (React.createElement(Flex, { justify: "center", alignItems: "center", w: "full", minH: "screen" },
             React.createElement(NonIdealState, { title: "Failed to parse OpenAPI file", description: "Please make sure your OpenAPI file is valid and try again" })));
     }
-    return (React.createElement(InlineRefResolverProvider, { document: parsedDocument }, layout === 'stacked' ? (React.createElement(APIWithStackedLayout, { serviceNode: serviceNode, hideTryIt: hideTryIt, hideExport: hideExport, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy })) : (React.createElement(APIWithSidebarLayout, { logo: logo, logoLink: logoLink, serviceNode: serviceNode, hideTryIt: hideTryIt, hideSchemas: hideSchemas, hideInternal: hideInternal, hideExport: hideExport, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy }))));
+    return (React.createElement(InlineRefResolverProvider, { document: parsedDocument }, layout === 'stacked' ? (React.createElement(APIWithStackedLayout, { serviceNode: serviceNode, hideTryIt: hideTryIt, hideExport: hideExport, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy, defaultExpandedDepth: defaultExpandedDepth })) : (React.createElement(APIWithSidebarLayout, { logo: logo, logoLink: logoLink, serviceNode: serviceNode, hideTryIt: hideTryIt, hideSchemas: hideSchemas, hideInternal: hideInternal, hideExport: hideExport, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy, defaultExpandedDepth: defaultExpandedDepth }))));
 };
 const API = flow(withRouter, withStyles, withPersistenceBoundary, withMosaicProvider, withQueryClientProvider)(APIImpl);
 

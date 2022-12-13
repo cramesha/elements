@@ -18,6 +18,7 @@ export interface CommonAPIProps extends RoutingProps {
     hideExport?: boolean;
     tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
     tryItCorsProxy?: string;
+    defaultExpandedDepth?: number;
 }
 export declare const APIImpl: React.FC<APIProps>;
 export declare const API: React.FC<APIProps>;

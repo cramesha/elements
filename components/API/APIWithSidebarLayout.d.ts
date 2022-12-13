@@ -12,6 +12,7 @@ declare type SidebarLayoutProps = {
     exportProps?: ExportButtonProps;
     tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
     tryItCorsProxy?: string;
+    defaultExpandedDepth?: number;
 };
 export declare const APIWithSidebarLayout: React.FC<SidebarLayoutProps>;
 export {};
