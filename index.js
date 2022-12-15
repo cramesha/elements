@@ -190,14 +190,18 @@ const isInternal = (node) => {
     return !!data['x-internal'];
 };
 
-const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth }) => {
+const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth, }) => {
     const container = React__namespace.useRef(null);
     const tree = React__namespace.useMemo(() => computeAPITree(serviceNode, { hideSchemas, hideInternal }), [serviceNode, hideSchemas, hideInternal]);
     const location = reactRouterDom.useLocation();
     const { pathname } = location;
     const isRootPath = !pathname || pathname === '/';
     const node = isRootPath ? serviceNode : serviceNode.children.find(child => child.uri === pathname);
-    const layoutOptions = React__namespace.useMemo(() => ({ hideTryIt: hideTryIt, hideExport: hideExport || (node === null || node === void 0 ? void 0 : node.type) !== types.NodeType.HttpService, defaultExpandedDepth }), [hideTryIt, hideExport, node, defaultExpandedDepth]);
+    const layoutOptions = React__namespace.useMemo(() => ({
+        hideTryIt: hideTryIt,
+        hideExport: hideExport || (node === null || node === void 0 ? void 0 : node.type) !== types.NodeType.HttpService,
+        defaultExpandedDepth,
+    }), [hideTryIt, hideExport, node, defaultExpandedDepth]);
     if (!node) {
         const firstSlug = findFirstNodeSlug(tree);
         if (firstSlug) {
@@ -213,9 +217,7 @@ const APIWithSidebarLayout = ({ serviceNode, logo, logoLink, hideTryIt, hideSche
         }
     };
     const sidebar = (React__namespace.createElement(React__namespace.Fragment, null,
-        React__namespace.createElement(mosaic.Flex, { ml: 4, mb: 5, alignItems: "center" },
-            logo ? (React__namespace.createElement(elementsCore.Logo, { logo: { url: logo, altText: 'logo', href: logoLink || 'https://solargraf.com/' } })) : (serviceNode.data.logo && React__namespace.createElement(elementsCore.Logo, { logo: serviceNode.data.logo })),
-            React__namespace.createElement(mosaic.Heading, { size: 4 }, serviceNode.name)),
+        React__namespace.createElement(mosaic.Flex, { ml: 4, mb: 5, alignItems: "center" }, logo ? (React__namespace.createElement(elementsCore.Logo, { logo: { url: logo, altText: 'logo', href: logoLink || 'https://solargraf.com/' } })) : (serviceNode.data.logo && React__namespace.createElement(elementsCore.Logo, { logo: serviceNode.data.logo }))),
         React__namespace.createElement(mosaic.Flex, { flexGrow: true, flexShrink: true, overflowY: "auto", direction: "col" },
             React__namespace.createElement(elementsCore.TableOfContents, { tree: tree, activeId: pathname, Link: reactRouterDom.Link, onLinkClick: handleTocClick }))));
     return (React__namespace.createElement(elementsCore.SidebarLayout, { ref: container, sidebar: sidebar }, node && (React__namespace.createElement(elementsCore.ParsedDocs, { key: pathname, uri: pathname, node: node, nodeTitle: node.name, layoutOptions: layoutOptions, location: location, exportProps: exportProps, tryItCredentialsPolicy: tryItCredentialsPolicy, tryItCorsProxy: tryItCorsProxy }))));
@@ -229,7 +231,7 @@ const TryItContext = React__namespace.createContext({
     tryItCredentialsPolicy: 'omit',
 });
 TryItContext.displayName = 'TryItContext';
-const APIWithStackedLayout = ({ serviceNode, hideTryIt, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth }) => {
+const APIWithStackedLayout = ({ serviceNode, hideTryIt, hideExport, exportProps, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth, }) => {
     const location = reactRouterDom.useLocation();
     const { groups } = computeTagGroups(serviceNode);
     return (React__namespace.createElement(TryItContext.Provider, { value: { hideTryIt, tryItCredentialsPolicy, corsProxy: tryItCorsProxy } },
@@ -514,7 +516,7 @@ const propsAreWithDocument = (props) => {
     return props.hasOwnProperty('apiDescriptionDocument');
 };
 const APIImpl = props => {
-    const { layout, apiDescriptionUrl = '', logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth } = props;
+    const { layout, apiDescriptionUrl = '', logo, logoLink, hideTryIt, hideSchemas, hideInternal, hideExport, tryItCredentialsPolicy, tryItCorsProxy, defaultExpandedDepth, } = props;
     const apiDescriptionDocument = propsAreWithDocument(props) ? props.apiDescriptionDocument : undefined;
     const { data: fetchedDocument, error } = reactQuery.useQuery([apiDescriptionUrl], () => fetch(apiDescriptionUrl).then(res => {
         if (res.ok) {
