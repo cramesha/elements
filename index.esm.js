@@ -2270,7 +2270,7 @@ const SecuritySchemes$1 = ({ schemes }) => {
         React.createElement(NodeAnnotation, { change: nodeHasChanged === null || nodeHasChanged === void 0 ? void 0 : nodeHasChanged({ nodeId: scheme.id }) }))))));
 };
 
-const Responses = ({ responses: unsortedResponses, defaultExpandedDepth, onStatusCodeChange, onMediaTypeChange }) => {
+const Responses = ({ responses: unsortedResponses, defaultExpandedDepth, onStatusCodeChange, onMediaTypeChange, }) => {
     var _a, _b;
     const responses = sortBy(uniqBy(unsortedResponses, r => r.code), r => r.code);
     const [activeResponseId, setActiveResponseId] = React.useState((_b = (_a = responses[0]) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : '');
@@ -2648,8 +2648,8 @@ function useResizer(sidebarWidth) {
 
 const Logo = ({ logo }) => {
     var _a;
-    return (React.createElement(Box, { display: "inline", mr: 3, rounded: "lg", overflowY: "hidden", overflowX: "hidden", style: { backgroundColor: (_a = logo.backgroundColor) !== null && _a !== void 0 ? _a : 'transparent' } }, logo.href ? (React.createElement("a", { href: logo.href, target: "_blank", rel: "noopener noreferrer" },
-        React.createElement("img", { src: logo.url, height: "30px", width: "30px", alt: logo.altText }))) : (React.createElement("img", { src: logo.url, height: "30px", width: "30px", alt: logo.altText }))));
+    return (React.createElement(Box, { display: "inline", mr: 3, rounded: "none", overflowY: "hidden", overflowX: "hidden", style: { backgroundColor: (_a = logo.backgroundColor) !== null && _a !== void 0 ? _a : 'transparent' } }, logo.href ? (React.createElement("a", { href: logo.href, target: "_blank", rel: "noopener noreferrer" },
+        React.createElement("img", { src: logo.url, width: "240", height: "100", alt: logo.altText }))) : (React.createElement("img", { src: logo.url, width: "240", height: "100", alt: logo.altText }))));
 };
 
 function getDisplayName(WrappedComponent) {

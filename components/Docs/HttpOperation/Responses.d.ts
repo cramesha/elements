@@ -6,7 +6,7 @@ interface ResponsesProps {
     onStatusCodeChange(statusCode: string): void;
 }
 export declare const Responses: {
-    ({ responses: unsortedResponses, defaultExpandedDepth, onStatusCodeChange, onMediaTypeChange }: ResponsesProps): JSX.Element | null;
+    ({ responses: unsortedResponses, defaultExpandedDepth, onStatusCodeChange, onMediaTypeChange, }: ResponsesProps): JSX.Element | null;
     displayName: string;
 };
 export {};
