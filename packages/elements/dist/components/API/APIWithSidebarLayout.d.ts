@@ -1,0 +1,32 @@
+import { ExportButtonProps, TableOfContentsItem } from '@stoplight/elements-core';
+import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+import * as React from 'react';
+import { ServiceNode } from '../../utils/oas/types';
+declare type SidebarLayoutProps = {
+    serviceNode: ServiceNode;
+    logo?: string;
+    hideTryItPanel?: boolean;
+    hideTryIt?: boolean;
+    hideSamples?: boolean;
+    hideSchemas?: boolean;
+    hideInternal?: boolean;
+    hideServerInfo?: boolean;
+    hideSecurityInfo?: boolean;
+    hideExport?: boolean;
+    exportProps?: ExportButtonProps;
+    tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
+    tryItCorsProxy?: string;
+    renderExtensionAddon?: ExtensionAddonRenderer;
+    basePath?: string;
+    outerRouter?: boolean;
+};
+export declare const APIWithSidebarLayout: React.FC<SidebarLayoutProps>;
+declare type SidebarProps = {
+    serviceNode: ServiceNode;
+    logo?: string;
+    container: React.RefObject<HTMLElement>;
+    pathname: string;
+    tree: TableOfContentsItem[];
+};
+export declare const Sidebar: React.FC<SidebarProps>;
+export {};

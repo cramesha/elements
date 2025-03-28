@@ -1,0 +1,25 @@
+import { ExportButtonProps } from '@stoplight/elements-core';
+import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+import * as React from 'react';
+import { ServiceNode } from '../../utils/oas/types';
+declare type SidebarLayoutProps = {
+    serviceNode: ServiceNode;
+    logo?: string;
+    hideTryItPanel?: boolean;
+    hideTryIt?: boolean;
+    hideSamples?: boolean;
+    hideSchemas?: boolean;
+    hideInternal?: boolean;
+    hideExport?: boolean;
+    hideServerInfo?: boolean;
+    hideSecurityInfo?: boolean;
+    exportProps?: ExportButtonProps;
+    tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
+    tryItCorsProxy?: string;
+    compact?: number | boolean;
+    renderExtensionAddon?: ExtensionAddonRenderer;
+    basePath?: string;
+    outerRouter?: boolean;
+};
+export declare const APIWithResponsiveSidebarLayout: React.FC<SidebarLayoutProps>;
+export {};
